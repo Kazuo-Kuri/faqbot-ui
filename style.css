@@ -3,7 +3,7 @@ body {
   font-family: 'Helvetica Neue', sans-serif;
   background-color: #f7f9fb;
   margin: 0;
-  padding: 2em;
+  padding: 1em;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,7 +11,7 @@ body {
 
 /* 見出し */
 h1 {
-  font-size: 1.8em;
+  font-size: 1.3em;
   margin-bottom: 1em;
   color: #2c3e50;
   text-align: center;
