@@ -2,70 +2,25 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PSIサポートチャット</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="chat-container">
   <h1>PSIサポートチャット</h1>
 
-  <!-- 入力欄 -->
-  <input type="text" id="question" placeholder="質問を入力してください" />
-
   <!-- チャット表示エリア -->
-  <div id="chat-container" class="chat-container"></div>
+  <div id="chat-container">
+    <!-- チャットメッセージがここに表示される -->
+  </div>
 
-  <script>
-    const input = document.getElementById("question");
-    const chatContainer = document.getElementById("chat-container");
+  <!-- 入力欄 -->
+   <div class="chat-input-area">
+  <input type="text" id="question" placeholder="質問を入力してください" />
+</div>
+</div>
 
-    async function ask() {
-      const question = input.value.trim();
-      if (!question) return;
-
-      // ユーザーのメッセージを追加
-      chatContainer.innerHTML += `
-        <div class="chat-message left">
-          <div class="label">ユーザー</div>
-          <div class="bubble user">${question}</div>
-        </div>
-      `;
-      input.value = "";
-
-      try {
-        const res = await fetch("https://faqbot-ngw3.onrender.com/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question })
-        });
-
-        const data = await res.json();
-        const answer = data.response;
-
-        // サポートのメッセージを追加
-        chatContainer.innerHTML += `
-          <div class="chat-message right">
-            <div class="label">サポート</div>
-            <div class="bubble support">${answer}</div>
-          </div>
-        `;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-
-      } catch (err) {
-        chatContainer.innerHTML += `
-          <div class="chat-message right">
-            <div class="label">サポート</div>
-            <div class="bubble support">エラーが発生しました。</div>
-          </div>
-        `;
-      }
-    }
-
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        ask();
-      }
-    });
-  </script>
+<script src="script.js"></script>
 </body>
 </html>
