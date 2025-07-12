@@ -20,31 +20,77 @@ h1 {
 /* 入力フォーム */
 input[type="text"] {
   width: 70%;
+  max-width: 600px;
   padding: 0.6em 1em;
   font-size: 1em;
   border: 1px solid #ccc;
   border-radius: 6px;
-  margin-right: 0.5em;
+  margin: 1em 0;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* 送信ボタン */
-button {
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+/* チャット表示エリア */
+#chat-container {
+  width: 90%;
+  max-width: 800px;
+  margin-top: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  overflow-y: auto;
+  height: 400px;
+  padding: 0 1em;
 }
 
-button:hover {
-  background-color: #45a049;
+/* メッセージ共通 */
+.chat-message {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
 }
 
-/* 回答エリア */
+/* ユーザー：左揃え */
+.chat-message.left {
+  align-self: flex-start;
+}
+
+/* サポート：右揃え */
+.chat-message.right {
+  align-self: flex-end;
+  text-align: right;
+}
+
+/* ラベル */
+.label {
+  font-size: 0.75em;
+  color: #888;
+  margin-bottom: 0.2em;
+}
+
+/* 吹き出し共通 */
+.bubble {
+  padding: 10px 15px;
+  border-radius: 12px;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-size: 1.05em;
+  line-height: 1.6em;
+}
+
+/* 吹き出し：ユーザー */
+.bubble.user {
+  background-color: #e0f7da;
+  color: #333;
+}
+
+/* 吹き出し：サポート */
+.bubble.support {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  color: #333;
+}
+
+/* 回答エリア（旧 #response）※未使用なら削除OK */
 #response {
   margin-top: 2em;
   padding: 1em;
