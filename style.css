@@ -1,244 +1,52 @@
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  font-family: sans-serif;
-  display: flex;
-  min-height: 100vh;
-}
-
-/* 共通ナビゲーションスタイル */
-nav {
-  background: #f4f4f4;
-  padding: 20px;
-}
-
-nav img {
-  max-width: 135px;
-  height: auto;
-  display: block;
-  margin-bottom: 20px;
-}
-
-nav h2 {
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-
-nav ul {
-  list-style: none;
-  padding: 0;
-}
-
-nav li {
-  margin-bottom: 8px;
-}
-
-nav a {
-  text-decoration: none;
-  color: #333;
-}
-
-nav a:hover {
-  text-decoration: underline;
-}
-
-nav a.active {
-  font-weight: bold;
-  color: #007bff;
-  text-decoration: underline;
-}
-
-nav ul ul {
-  padding-left: 20px;
-  margin: 4px 0 8px 0;
-}
-
-nav ul ul li {
-  font-size: 14px;
-}
-
-main {
-  flex-grow: 1;
-  padding: 20px;
-  overflow-y: auto;
-  color: #333;
-}
-
-section {
-  margin-bottom: 40px;
-}
-
-section h2 {
-  font-size: 25px;
-  margin-top: 0;
-}
-
-section h3 {
-  font-size: 20px;
-  margin-top: 0;
-}
-
-.manual-image {
-  max-width: 100%;
-  height: auto;
-  border: 1px solid #ccc;
-}
-
-/* 注意書きカード */
-.alert-box {
-  background-color: #fff5f5;
-  border-left: 4px solid #ff4d4f;
-  color: #d8000c;
-  padding: 10px 16px;
-  margin: 16px 0;
-  border-radius: 4px;
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-/* ==========================
-   モバイル用（幅768px以下）
-========================== */
-@media screen and (max-width: 768px) {
+<style>
   body {
-    flex-direction: column;
+    font-family: 'Helvetica Neue', sans-serif;
+    margin: 0;
+    padding: 0;
   }
 
-  main {
-    padding-top: 80px;
-  }
-
-  section ol li {
-    margin-bottom: 24px;
-  }
-
-  /* モバイルヘッダー */
-  .mobile-header {
+  #chat-button {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: white;
-    z-index: 1001;
-    display: flex;
-    align-items: left;
-    justify-content: left;
-    padding: 10px 16px ;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .mobile-logo {
-    height: 42px;
-  }
-
-  .spacer {
-    position: absolute;
-    left: 16px;
-    width: 36px;
-    height: 36px;
-  }
-
-  .menu-toggle {
-    position: absolute;
-    right: 36px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 36px;
-    background: none;
+    bottom: 24px;
+    right: 24px;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    color: white;
     border: none;
-    color: #333;
-    padding: 4px 8px;
-    cursor: pointer;
-    z-index: 1002;
-  }
-
-  nav {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 80%;
-    max-width: 300px;
-    height: 100%;
-    background: #f4f4f4;
-    box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-    transition: right 0.3s ease;
-    z-index: 1000;
-    padding: 20px;
-  }
-
-  nav.open {
-    right: 0;
-  }
-
-  .close-btn {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
     font-size: 24px;
-    border: none;
-    background: none;
-    float: right;
     cursor: pointer;
-    margin-bottom: 16px;
+    z-index: 9999;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .logo-inside {
-    display: none !important;
+  #chat-button:hover {
+    background: linear-gradient(135deg, #66BB6A, #388E3C);
   }
 
-  .nav-header {
-    display: none;
-  }
-
-  #overlay {
+  #chat-box {
     position: fixed;
-    top: 0;
-    left: 0;
+    bottom: 100px;
+    right: 24px;
+    width: 380px;
+    height: 540px;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    z-index: 9998;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    border: 1px solid #ccc;
+  }
+
+  #chat-frame {
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 999;
-    display: none;
+    border: none;
   }
-
-  #overlay.active {
-    display: block;
-  }
-}
-
-/* ==========================
-   PC用（幅769px以上）
-========================== */
-@media screen and (min-width: 769px) {
-  body {
-    flex-direction: row;
-  }
-
-  .logo-inside {
-    display: block;
-    margin-bottom: 20px;
-    max-width: 135px;
-    height: auto;
-  }
-
-  .menu-toggle,
-  .close-btn,
-  .mobile-header,
-  #overlay {
-    display: none !important;
-  }
-
-  .nav-header {
-    display: none;
-  }
-
-  nav {
-    position: sticky;
-    top: 0;
-    width: 300px;
-    height: 100vh;
-    overflow-y: auto;
-    border-right: 1px solid #ccc;
-  }
-}
+</style>
