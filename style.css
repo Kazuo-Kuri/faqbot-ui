@@ -14,6 +14,7 @@ html, body {
 .chat-container {
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: space-between;
   height: 100%;
   width: 100%;
@@ -41,10 +42,17 @@ h1 {
   gap: 1em;
 }
 
-/* 入力欄を下部に固定する領域 */
+/* 入力欄を下部に固定し、中央に配置する */
 .chat-input-area {
+  position: sticky;
+  bottom: 0;
+  background: #f7f9fb;
+  padding: 0.5em 0 1em;
   border-top: 1px solid #ccc;
-  padding-top: 0.5em;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  z-index: 1; /* スクロール中に他要素より前面に */
 }
 
 /* 入力フォーム */
