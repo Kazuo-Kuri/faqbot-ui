@@ -2,17 +2,32 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
 
+  // 共通のスクロール関数
+  function scrollToBottom() {
+  chatContainer.scrollTo({
+    top: chatContainer.scrollHeight,
+    behavior: "smooth"
+  });
+}
+
+  // メッセージをチャットエリアに追加する関数
+  function appendMessage(sender, message, alignment) {
+    const messageHtml = `
+      <div class="chat-message ${alignment}">
+        <div class="label">${sender}</div>
+        <div class="bubble ${alignment === 'left' ? 'user' : 'support'}">${message}</div>
+      </div>
+    `;
+    chatContainer.insertAdjacentHTML('beforeend', messageHtml);
+    scrollToBottom();
+  }
+
+  // メッセージ送信処理
   async function ask() {
     const question = input.value.trim();
     if (!question) return;
 
-    // ユーザーのメッセージを追加
-    chatContainer.innerHTML += `
-      <div class="chat-message left">
-        <div class="label">ユーザー</div>
-        <div class="bubble user">${question}</div>
-      </div>
-    `;
+    appendMessage("ユーザー", question, "left");
     input.value = "";
 
     try {
@@ -23,27 +38,16 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const data = await res.json();
-      const answer = data.response;
+      const answer = data.response || "申し訳ありません、回答を取得できませんでした。";
 
-      // サポートのメッセージを追加
-      chatContainer.innerHTML += `
-        <div class="chat-message right">
-          <div class="label">サポート</div>
-          <div class="bubble support">${answer}</div>
-        </div>
-      `;
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+      appendMessage("サポート", answer, "right");
 
     } catch (err) {
-      chatContainer.innerHTML += `
-        <div class="chat-message right">
-          <div class="label">サポート</div>
-          <div class="bubble support">エラーが発生しました。</div>
-        </div>
-      `;
+      appendMessage("サポート", "エラーが発生しました。", "right");
     }
   }
 
+  // Enterキーで送信
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();

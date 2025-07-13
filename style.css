@@ -128,3 +128,28 @@ h1 {
   color: #333;
   white-space: pre-wrap;
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.bubble.support {
+  animation: fadeIn 0.4s ease, pop 0.2s ease-out;
+}
+
+.bubble.user {
+  background-color: #e0f7da;
+  color: #333;
+  animation: fadeIn 0.4s ease; /* 追加 */
+}
+
+@keyframes pop {
+  0%   { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.chat-container {
+  max-height: 100vh;
+  overflow: hidden;
+}
