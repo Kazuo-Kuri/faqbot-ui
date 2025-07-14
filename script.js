@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
 
-  // スクロール処理
   function scrollToBottom() {
     chatContainer.scrollTo({
       top: chatContainer.scrollHeight,
@@ -10,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // タイピング風表示（1文字ずつ追加）
   function typeText(element, text, speed = 60) {
     let index = 0;
     function showNextChar() {
@@ -24,8 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showNextChar();
   }
 
-  // チャットメッセージを追加
-  function appendMessage(sender, message, alignment) {
+  function appendMessage(sender, message, alignment, originalQuestion = null) {
     const messageWrapper = document.createElement("div");
     messageWrapper.className = `chat-message ${alignment}`;
 
@@ -48,12 +45,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (alignment === "right") {
       typeText(bubble, message);
+      addFeedbackButtons(messageWrapper, originalQuestion, message);
     } else {
       bubble.textContent = message;
     }
   }
 
-  // 質問送信処理
+  function addFeedbackButtons(container, question, answer) {
+    const feedbackDiv = document.createElement("div");
+    feedbackDiv.className = "feedback-buttons";
+    feedbackDiv.innerHTML = `
+      この回答は役に立ちましたか？　
+      <button class="feedback-btn" data-feedback="useful">👍 はい</button>
+      <button class="feedback-btn" data-feedback="not_useful">👎 いいえ</button>
+    `;
+    container.appendChild(feedbackDiv);
+
+    const buttons = feedbackDiv.querySelectorAll(".feedback-btn");
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const feedback = btn.dataset.feedback;
+        if (feedback === "useful") {
+          sendFeedback(question, answer, feedback, "");
+          feedbackDiv.innerHTML = "フィードバックありがとうございました！";
+        } else {
+          showFeedbackReasonForm(feedbackDiv, question, answer);
+        }
+      });
+    });
+  }
+
+  function showFeedbackReasonForm(container, question, answer) {
+    container.innerHTML = `
+      <label for="reason-input">差し支えなければ、理由を教えてください：</label>
+      <textarea id="reason-input" rows="2" placeholder="例：情報が古かった、質問と違う内容だった など"></textarea>
+      <button id="submit-reason">送信</button>
+    `;
+    const submitButton = container.querySelector("#submit-reason");
+    submitButton.addEventListener("click", () => {
+      const reason = container.querySelector("#reason-input").value.trim();
+      sendFeedback(question, answer, "not_useful", reason);
+      container.innerHTML = "フィードバックありがとうございました！";
+    });
+  }
+
+  function sendFeedback(question, answer, feedback, reason) {
+    fetch("https://script.google.com/macros/s/AKfycbwZTA7HfylzjK2ovPzUjlOBrHZaCpae6ZHZM5C93tMEy0zzHSE-WrvV2-tajuJZP0Lj/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question: question,
+        answer: answer,
+        feedback: feedback,
+        reason: reason
+      })
+    });
+  }
+
   async function ask() {
     const question = input.value.trim();
     if (!question) return;
@@ -72,14 +120,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await res.json();
       const answer = data.response?.trim() || "申し訳ありません、回答を取得できませんでした。";
-      appendMessage("サポート", answer, "right");
+      appendMessage("サポート", answer, "right", question);
     } catch (err) {
       console.error("通信エラー:", err);
-      appendMessage("サポート", "エラーが発生しました。", "right");
+      appendMessage("サポート", "エラーが発生しました。", "right", question);
     }
   }
 
-  // Enterキーで送信
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -87,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // チャットを閉じる処理
   window.closeChat = function () {
     alert("チャットを閉じます（ここに閉じる処理を追加できます）");
   };
