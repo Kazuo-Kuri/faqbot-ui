@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
+  const spinner = document.getElementById("loading-spinner");
 
   function scrollToBottom() {
     chatContainer.scrollTo({
@@ -54,10 +55,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function addFeedbackButtons(container, question, answer) {
     const feedbackDiv = document.createElement("div");
     feedbackDiv.className = "feedback-buttons";
+    feedbackDiv.style.marginTop = "0.5em";
+    feedbackDiv.style.fontSize = "0.85em";
+
     feedbackDiv.innerHTML = `
-      この回答は役に立ちましたか？　
-      <button class="feedback-btn" data-feedback="useful">👍 はい</button>
-      <button class="feedback-btn" data-feedback="not_useful">👎 いいえ</button>
+      <div style="margin-bottom: 0.2em;">この回答は役に立ちましたか？</div>
+      <div style="display: flex; gap: 0.5em;">
+        <button class="feedback-btn" data-feedback="useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 4px 8px; cursor: pointer;">👍 はい</button>
+        <button class="feedback-btn" data-feedback="not_useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 4px 8px; cursor: pointer;">👎 いいえ</button>
+      </div>
     `;
     container.appendChild(feedbackDiv);
 
@@ -77,9 +83,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showFeedbackReasonForm(container, question, answer) {
     container.innerHTML = `
-      <label for="reason-input">差し支えなければ、理由を教えてください：</label>
-      <textarea id="reason-input" rows="2" placeholder="例：情報が古かった、質問と違う内容だった など"></textarea>
-      <button id="submit-reason">送信</button>
+      <label for="reason-input" style="font-size: 0.8em;">差し支えなければ、理由を教えてください：</label>
+      <textarea id="reason-input" rows="2" placeholder="例：情報が古かった、質問と違う内容だった など" style="width: 100%; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; padding: 4px;"></textarea>
+      <button id="submit-reason" style="margin-top: 4px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">送信</button>
     `;
     const submitButton = container.querySelector("#submit-reason");
     submitButton.addEventListener("click", () => {
@@ -109,6 +115,8 @@ document.addEventListener("DOMContentLoaded", () => {
     appendMessage("ユーザー", question, "left");
     input.value = "";
 
+    if (spinner) spinner.style.display = "block";
+
     try {
       const res = await fetch("https://faqbot-ngw3.onrender.com/chat", {
         method: "POST",
@@ -124,6 +132,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.error("通信エラー:", err);
       appendMessage("サポート", "エラーが発生しました。", "right", question);
+    } finally {
+      if (spinner) spinner.style.display = "none";
     }
   }
 
