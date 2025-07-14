@@ -1,10 +1,6 @@
-// ✅ script.js（完全版：Markdownリンク & 別タブ対応）
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
-
-  // ✅ MarkdownIt を初期化（CDNで読み込んでおく必要あり）
-  const md = window.markdownit();
 
   // スクロール処理
   function scrollToBottom() {
@@ -14,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // タイピング風表示（サポート）
+  // タイピング風表示（1文字ずつ追加）
   function typeText(element, text, speed = 60) {
     let index = 0;
     function showNextChar() {
@@ -28,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showNextChar();
   }
 
-  // チャットメッセージ追加
+  // チャットメッセージを追加
   function appendMessage(sender, message, alignment) {
     const messageWrapper = document.createElement("div");
     messageWrapper.className = `chat-message ${alignment}`;
@@ -51,15 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     scrollToBottom();
 
     if (alignment === "right") {
-      // ✅ Markdown を HTML に変換して表示
-      const html = md.render(message);
-      bubble.innerHTML = html;
-
-      // ✅ すべてのリンクを別タブで開くように設定
-      bubble.querySelectorAll("a").forEach(link => {
-        link.setAttribute("target", "_blank");
-        link.setAttribute("rel", "noopener noreferrer");
-      });
+      typeText(bubble, message);
     } else {
       bubble.textContent = message;
     }
@@ -85,14 +73,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       const answer = data.response?.trim() || "申し訳ありません、回答を取得できませんでした。";
       appendMessage("サポート", answer, "right");
-
     } catch (err) {
       console.error("通信エラー:", err);
       appendMessage("サポート", "エラーが発生しました。", "right");
     }
   }
 
-  // Enterキー送信
+  // Enterキーで送信
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -100,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 閉じるボタン処理
+  // チャットを閉じる処理
   window.closeChat = function () {
     alert("チャットを閉じます（ここに閉じる処理を追加できます）");
   };
