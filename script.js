@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showFeedbackReasonForm(container, question, answer) {
     container.innerHTML = `
-      <label for="reason-input" style="font-size: 1.0em; color: #666;">差し支えなければ、理由を教えてください：</label>
+      <label for="reason-input" style="font-size: 0.8em; color: #666;">差し支えなければ、理由を教えてください：</label>
       <textarea id="reason-input" rows="2" placeholder="例：情報が古かった、質問と違う内容だった など" style="width: 100%; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; padding: 4px;"></textarea>
       <button id="submit-reason" style="margin-top: 4px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">送信</button>
     `;
