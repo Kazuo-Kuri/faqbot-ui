@@ -1,4 +1,4 @@
-// ✅ script.js（完全版）
+// ✅ script.js（完全版・HTMLリンク対応・別タブで開く）
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
@@ -11,12 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // タイピング風表示（サポート）
+  // タイピング風表示（サポート用／HTML対応）
   function typeText(element, text, speed = 60) {
+    element.innerHTML = "";  // 初期化
+    const span = document.createElement("span");
+    element.appendChild(span);
+
     let index = 0;
     function showNextChar() {
       if (index < text.length) {
-        element.textContent += text.charAt(index);
+        span.innerHTML += text.charAt(index);
         index++;
         scrollToBottom();
         setTimeout(showNextChar, speed);
@@ -49,9 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
     scrollToBottom();
 
     if (alignment === "right") {
-      typeText(bubble, message);
+      typeText(bubble, message); // タイピング表示＋HTML対応済み
     } else {
-      bubble.textContent = message;
+      bubble.innerHTML = message; // ユーザー側もHTML表示対応
     }
   }
 
@@ -73,7 +77,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!res.ok) throw new Error("Network error");
 
       const data = await res.json();
-      const answer = data.response?.trim() || "申し訳ありません、回答を取得できませんでした。";
+      let answer = data.response?.trim() || "申し訳ありません、回答を取得できませんでした。";
+
+      // 応答に含まれる aタグに target="_blank" を強制付与（安全対策）
+      answer = answer.replace(/<a\s+/g, '<a target="_blank" ');
+
       appendMessage("サポート", answer, "right");
 
     } catch (err) {
