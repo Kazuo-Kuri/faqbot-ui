@@ -8,11 +8,14 @@
 </head>
 <body>
   <div class="chat-container">
-    <h1>PSIサポートチャット</h1>
+    <!-- タイトル + 閉じるボタン -->
+    <div class="chat-header">
+      <span class="chat-title">PSIサポートチャット</span>
+      <button class="close-button" onclick="closeChat()">&#10005;</button>
+    </div>
 
     <!-- チャット表示エリア -->
     <div id="chat-container">
-      <!-- 初期表示例（必要に応じて削除） -->
       <div class="chat-message right">
         <div class="label">サポート</div>
         <div class="bubble support">こんにちは！どのようにお手伝いできますか？</div>
@@ -26,5 +29,10 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+    function closeChat() {
+      alert("チャットを閉じます（ここに閉じる処理を追加できます）");
+    }
+  </script>
 </body>
 </html>

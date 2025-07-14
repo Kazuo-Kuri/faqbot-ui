@@ -1,8 +1,9 @@
+// ✅ script.js（完全版）
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
 
-  // ユーティリティ：スクロール
+  // スクロール処理
   function scrollToBottom() {
     chatContainer.scrollTo({
       top: chatContainer.scrollHeight,
@@ -10,12 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // タイピング風の表示（サポート側）
-  function typeText(element, text, speed = 30) {
+  // タイピング風表示（サポート）
+  function typeText(element, text, speed = 60) {
     let index = 0;
     function showNextChar() {
       if (index < text.length) {
-        element.innerHTML += text.charAt(index);
+        element.textContent += text.charAt(index);
         index++;
         scrollToBottom();
         setTimeout(showNextChar, speed);
@@ -24,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showNextChar();
   }
 
-  // チャットメッセージの追加
+  // チャットメッセージ追加
   function appendMessage(sender, message, alignment) {
     const messageWrapper = document.createElement("div");
     messageWrapper.className = `chat-message ${alignment}`;
@@ -35,6 +36,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const bubble = document.createElement("div");
     bubble.className = `bubble ${alignment === "left" ? "user" : "support"}`;
+
+    // 最初に幅を確保（特にサポート回答エリア）
+    if (alignment === "right") {
+      bubble.style.minWidth = "70%";
+      bubble.style.minHeight = "1.5em";
+    }
 
     messageWrapper.appendChild(label);
     messageWrapper.appendChild(bubble);
@@ -63,20 +70,28 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ question })
       });
 
-      if (!res.ok) throw new Error("Network response was not ok");
+      if (!res.ok) throw new Error("Network error");
 
       const data = await res.json();
       const answer = data.response?.trim() || "申し訳ありません、回答を取得できませんでした。";
       appendMessage("サポート", answer, "right");
 
     } catch (err) {
-      console.error("エラー:", err);
+      console.error("通信エラー:", err);
       appendMessage("サポート", "エラーが発生しました。", "right");
     }
   }
 
-  // Enterキーで送信
+  // Enterキー送信
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      ask
+      ask();
+    }
+  });
+
+  // 閉じるボタン処理
+  window.closeChat = function () {
+    alert("チャットを閉じます（ここに閉じる処理を追加できます）");
+  };
+});
