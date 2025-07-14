@@ -1,45 +1,158 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PSIサポートチャット</title>
-  <link rel="stylesheet" href="style.css" />
-  <style type="text/css">
-  body,td,th {
-    font-family: "Helvetica Neue", sans-serif;
-}
-  </style>
-<script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
-</head>
-<body>
-  <div class="chat-container">
-    <!-- タイトル + 閉じるボタン -->
-    <div class="chat-header">
-      <span class="chat-title">PSIサポートチャット</span>
-      <button class="close-button" onclick="closeChat()">&#10005;</button>
-    </div>
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("question");
+  const chatContainer = document.getElementById("chat-container");
+  const spinner = document.getElementById("loading-spinner");
 
-    <!-- チャット表示エリア -->
-    <div id="chat-container">
-      <div class="chat-message right">
-        <div class="label">サポート</div>
-        <div class="bubble support">こんにちは！どのようにお手伝いできますか？</div>
+  function scrollToBottom() {
+    chatContainer.scrollTo({
+      top: chatContainer.scrollHeight,
+      behavior: "smooth"
+    });
+  }
+
+  function typeText(element, text, speed = 60) {
+    let index = 0;
+    function showNextChar() {
+      if (index < text.length) {
+        element.textContent += text.charAt(index);
+        index++;
+        scrollToBottom();
+        setTimeout(showNextChar, speed);
+      }
+    }
+    showNextChar();
+  }
+
+  function appendMessage(sender, message, alignment, originalQuestion = null) {
+    const messageWrapper = document.createElement("div");
+    messageWrapper.className = `chat-message ${alignment}`;
+
+    const label = document.createElement("div");
+    label.className = "label";
+    label.textContent = sender;
+
+    const bubble = document.createElement("div");
+    bubble.className = `bubble ${alignment === "left" ? "user" : "support"}`;
+
+    if (alignment === "right") {
+      bubble.style.minWidth = "70%";
+      bubble.style.minHeight = "1.5em";
+    }
+
+    messageWrapper.appendChild(label);
+    messageWrapper.appendChild(bubble);
+    chatContainer.appendChild(messageWrapper);
+    scrollToBottom();
+
+    if (alignment === "right") {
+      typeText(bubble, message);
+      addFeedbackButtons(messageWrapper, originalQuestion, message);
+    } else {
+      bubble.textContent = message;
+    }
+  }
+
+  function addFeedbackButtons(container, question, answer) {
+    const feedbackDiv = document.createElement("div");
+    feedbackDiv.className = "feedback-buttons";
+    feedbackDiv.style.marginTop = "0.5em";
+    feedbackDiv.style.fontSize = "0.85em";
+
+    feedbackDiv.innerHTML = `
+      <div style="margin-bottom: 0.2em; color: #666;">この回答は役に立ちましたか？</div>
+      <div style="display: flex; gap: 0.5em; justify-content: flex-end;">
+        <button class="feedback-btn" data-feedback="useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👍 はい</button>
+        <button class="feedback-btn" data-feedback="not_useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👎 いいえ</button>
       </div>
-    </div>
-      
-<!-- ローディングスピナー表示領域 -->
-<div id="loading-spinner" style="display: none; text-align: center; padding: 1em;">
-  <div class="spinner-icon"></div>
-  <div style="margin-top: 0.5em; color: #888;">⏳ 回答を作成中です...</div>
-</div>  
+    `;
+    container.appendChild(feedbackDiv);
 
-    <!-- 入力欄 -->
-    <div class="chat-input-area">
-      <input type="text" id="question" placeholder="メッセージを入力..." />
-     </div>
-    </div>
-    
-  <script src="script.js"></script>
-</body>
-</html>
+    const buttons = feedbackDiv.querySelectorAll(".feedback-btn");
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const feedback = btn.dataset.feedback;
+        if (feedback === "useful") {
+          sendFeedback(question, answer, feedback, "");
+          feedbackDiv.innerHTML = "フィードバックありがとうございました！";
+        } else {
+          showFeedbackReasonForm(feedbackDiv, question, answer);
+        }
+      });
+    });
+  }
+
+  function showFeedbackReasonForm(container, question, answer) {
+    container.innerHTML = `
+      <label for="reason-input" style="font-size: 0.8em; color: #666;">差し支えなければ、理由を教えてください：</label>
+      <textarea id="reason-input" rows="2" placeholder="例：情報が古かった、質問と違う内容だった など" style="width: 100%; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; padding: 4px;"></textarea>
+      <button id="submit-reason" style="margin-top: 4px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">送信</button>
+    `;
+    const submitButton = container.querySelector("#submit-reason");
+    submitButton.addEventListener("click", () => {
+      const reason = container.querySelector("#reason-input").value.trim();
+      if (reason === "") {
+        alert("理由を入力してください。");
+        return;
+      }
+      sendFeedback(question, answer, "not_useful", reason);
+      container.innerHTML = "フィードバックありがとうございました！";
+    });
+  }
+
+  function sendFeedback(question, answer, feedback, reason) {
+    const payload = { question, answer, feedback, reason };
+    console.log("送信内容:", payload);
+
+    fetch("https://script.google.com/macros/s/AKfycbz2KqEuFVFGOSwmANOx6xMJlLROC03D_YSkUH93khDsVsUbKUFNHV4DLnKFm0kDQPwY/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.text())
+      .then(text => {
+        console.log("スクリプト応答:", text);
+      })
+      .catch(err => {
+        console.error("送信エラー:", err);
+      });
+  }
+
+  async function ask() {
+    const question = input.value.trim();
+    if (!question) return;
+
+    appendMessage("ユーザー", question, "left");
+    input.value = "";
+    spinner.style.display = "block";
+
+    try {
+      const res = await fetch("https://faqbot-ngw3.onrender.com/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question })
+      });
+
+      if (!res.ok) throw new Error("Network error");
+
+      const data = await res.json();
+      const answer = data.response?.trim() || "申し訳ありません、回答を取得できませんでした。";
+      appendMessage("サポート", answer, "right", question);
+    } catch (err) {
+      console.error("通信エラー:", err);
+      appendMessage("サポート", "エラーが発生しました。", "right", question);
+    } finally {
+      spinner.style.display = "none";
+    }
+  }
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      ask();
+    }
+  });
+
+  window.closeChat = function () {
+    alert("チャットを閉じます（ここに閉じる処理を追加できます）");
+  };
+});
