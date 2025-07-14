@@ -1,7 +1,10 @@
-// ✅ script.js（完全版・HTMLリンク対応・別タブで開く）
+// ✅ script.js（完全版：Markdownリンク & 別タブ対応）
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
+
+  // ✅ MarkdownIt を初期化（CDNで読み込んでおく必要あり）
+  const md = window.markdownit();
 
   // スクロール処理
   function scrollToBottom() {
@@ -11,16 +14,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // タイピング風表示（サポート用／HTML対応）
+  // タイピング風表示（サポート）
   function typeText(element, text, speed = 60) {
-    element.innerHTML = "";  // 初期化
-    const span = document.createElement("span");
-    element.appendChild(span);
-
     let index = 0;
     function showNextChar() {
       if (index < text.length) {
-        span.innerHTML += text.charAt(index);
+        element.textContent += text.charAt(index);
         index++;
         scrollToBottom();
         setTimeout(showNextChar, speed);
@@ -41,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const bubble = document.createElement("div");
     bubble.className = `bubble ${alignment === "left" ? "user" : "support"}`;
 
-    // 最初に幅を確保（特にサポート回答エリア）
     if (alignment === "right") {
       bubble.style.minWidth = "70%";
       bubble.style.minHeight = "1.5em";
@@ -53,9 +51,17 @@ document.addEventListener("DOMContentLoaded", () => {
     scrollToBottom();
 
     if (alignment === "right") {
-      typeText(bubble, message); // タイピング表示＋HTML対応済み
+      // ✅ Markdown を HTML に変換して表示
+      const html = md.render(message);
+      bubble.innerHTML = html;
+
+      // ✅ すべてのリンクを別タブで開くように設定
+      bubble.querySelectorAll("a").forEach(link => {
+        link.setAttribute("target", "_blank");
+        link.setAttribute("rel", "noopener noreferrer");
+      });
     } else {
-      bubble.innerHTML = message; // ユーザー側もHTML表示対応
+      bubble.textContent = message;
     }
   }
 
@@ -77,11 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!res.ok) throw new Error("Network error");
 
       const data = await res.json();
-      let answer = data.response?.trim() || "申し訳ありません、回答を取得できませんでした。";
-
-      // 応答に含まれる aタグに target="_blank" を強制付与（安全対策）
-      answer = answer.replace(/<a\s+/g, '<a target="_blank" ');
-
+      const answer = data.response?.trim() || "申し訳ありません、回答を取得できませんでした。";
       appendMessage("サポート", answer, "right");
 
     } catch (err) {
