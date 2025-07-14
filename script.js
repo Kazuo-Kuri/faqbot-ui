@@ -59,10 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
     feedbackDiv.style.fontSize = "0.85em";
 
     feedbackDiv.innerHTML = `
-      <div style="margin-bottom: 0.2em;">この回答は役に立ちましたか？</div>
-      <div style="display: flex; gap: 0.5em;">
-        <button class="feedback-btn" data-feedback="useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 4px 8px; cursor: pointer;">👍 はい</button>
-        <button class="feedback-btn" data-feedback="not_useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 4px 8px; cursor: pointer;">👎 いいえ</button>
+      <div style="margin-bottom: 0.2em; color: #666;">この回答は役に立ちましたか？</div>
+      <div style="display: flex; gap: 0.5em; justify-content: flex-end;">
+        <button class="feedback-btn" data-feedback="useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👍 はい</button>
+        <button class="feedback-btn" data-feedback="not_useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👎 いいえ</button>
       </div>
     `;
     container.appendChild(feedbackDiv);
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showFeedbackReasonForm(container, question, answer) {
     container.innerHTML = `
-      <label for="reason-input" style="font-size: 0.8em;">差し支えなければ、理由を教えてください：</label>
+      <label for="reason-input" style="font-size: 1.0em; color: #666;">差し支えなければ、理由を教えてください：</label>
       <textarea id="reason-input" rows="2" placeholder="例：情報が古かった、質問と違う内容だった など" style="width: 100%; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; padding: 4px;"></textarea>
       <button id="submit-reason" style="margin-top: 4px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">送信</button>
     `;
@@ -96,16 +96,27 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function sendFeedback(question, answer, feedback, reason) {
+    const payload = {
+      question: question,
+      answer: answer,
+      feedback: feedback,
+      reason: reason
+    };
+
+    console.log("送信内容:", payload); // ← デバッグ用
+
     fetch("https://script.google.com/macros/s/AKfycbwZTA7HfylzjK2ovPzUjlOBrHZaCpae6ZHZM5C93tMEy0zzHSE-WrvV2-tajuJZP0Lj/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        question: question,
-        answer: answer,
-        feedback: feedback,
-        reason: reason
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.text())
+      .then(text => {
+        console.log("スクリプト応答:", text);
       })
-    });
+      .catch(err => {
+        console.error("送信エラー:", err);
+      });
   }
 
   async function ask() {
@@ -115,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
     appendMessage("ユーザー", question, "left");
     input.value = "";
 
-    if (spinner) spinner.style.display = "block";
+    spinner.style.display = "block";
 
     try {
       const res = await fetch("https://faqbot-ngw3.onrender.com/chat", {
@@ -133,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("通信エラー:", err);
       appendMessage("サポート", "エラーが発生しました。", "right", question);
     } finally {
-      if (spinner) spinner.style.display = "none";
+      spinner.style.display = "none";
     }
   }
 

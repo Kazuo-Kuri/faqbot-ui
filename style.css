@@ -160,22 +160,32 @@ html, body {
   100% { transform: scale(1); }
 }
 
-.spinner {
-  position: fixed;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #888;
-  border-radius: 50%;
+/* スピナーアイコン（CSSアニメーション） */
+.spinner-icon {
+  margin: 0 auto;
   width: 24px;
   height: 24px;
+  border: 3px solid #ccc;
+  border-top: 3px solid #333;
+  border-radius: 50%;
   animation: spin 1s linear infinite;
-  z-index: 1000;
-  opacity: 0.6;
 }
 
 @keyframes spin {
-  0% { transform: translateX(-50%) rotate(0deg); }
-  100% { transform: translateX(-50%) rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.feedback-btn {
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.feedback-btn:hover {
+  background-color: #ffffff;
 }
