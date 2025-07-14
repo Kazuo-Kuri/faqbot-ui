@@ -90,20 +90,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = container.querySelector("#submit-reason");
     submitButton.addEventListener("click", () => {
       const reason = container.querySelector("#reason-input").value.trim();
+      if (reason === "") {
+        alert("理由を入力してください。");
+        return;
+      }
       sendFeedback(question, answer, "not_useful", reason);
       container.innerHTML = "フィードバックありがとうございました！";
     });
   }
 
   function sendFeedback(question, answer, feedback, reason) {
-    const payload = {
-      question: question,
-      answer: answer,
-      feedback: feedback,
-      reason: reason
-    };
-
-    console.log("送信内容:", payload); // ← デバッグ用
+    const payload = { question, answer, feedback, reason };
+    console.log("送信内容:", payload);
 
     fetch("https://script.google.com/macros/s/AKfycbwZTA7HfylzjK2ovPzUjlOBrHZaCpae6ZHZM5C93tMEy0zzHSE-WrvV2-tajuJZP0Lj/exec", {
       method: "POST",
@@ -125,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     appendMessage("ユーザー", question, "left");
     input.value = "";
-
     spinner.style.display = "block";
 
     try {
