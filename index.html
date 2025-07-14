@@ -8,19 +8,23 @@
 </head>
 <body>
   <div class="chat-container">
-  <h1>PSIサポートチャット</h1>
+    <h1>PSIサポートチャット</h1>
 
-  <!-- チャット表示エリア -->
-  <div id="chat-container">
-    <!-- チャットメッセージがここに表示される -->
+    <!-- チャット表示エリア -->
+    <div id="chat-container">
+      <!-- 初期表示例（必要に応じて削除） -->
+      <div class="chat-message right">
+        <div class="label">サポート</div>
+        <div class="bubble support">こんにちは！どのようにお手伝いできますか？</div>
+      </div>
+    </div>
+
+    <!-- 入力欄 -->
+    <div class="chat-input-area">
+      <input type="text" id="question" placeholder="メッセージを入力..." />
+    </div>
   </div>
 
-  <!-- 入力欄 -->
-   <div class="chat-input-area">
-  <input type="text" id="question" placeholder="質問を入力してください" />
-</div>
-</div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
