@@ -1,3 +1,4 @@
+// script.js（GAS廃止・/feedback対応済みバージョン）
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
@@ -103,14 +104,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const payload = { question, answer, feedback, reason };
     console.log("送信内容:", payload);
 
-    fetch("https://script.google.com/macros/s/AKfycbz2KqEuFVFGOSwmANOx6xMJlLROC03D_YSkUH93khDsVsUbKUFNHV4DLnKFm0kDQPwY/exec", {
+    fetch("https://faqbot-ngw3.onrender.com/feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     })
-      .then(res => res.text())
-      .then(text => {
-        console.log("スクリプト応答:", text);
+      .then(res => res.json())
+      .then(data => {
+        console.log("サーバー応答:", data);
       })
       .catch(err => {
         console.error("送信エラー:", err);
