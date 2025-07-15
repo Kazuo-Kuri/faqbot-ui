@@ -8,7 +8,7 @@ html, body {
   background-color: #f7f9fb;
   display: flex;
   justify-content: center;
-  align-items: stretch;
+  align-items: center;
 }
 
 /* チャット全体コンテナ */
@@ -17,13 +17,13 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  height: 100%;
+  height: 90vh;
+  max-height: 90vh;
   width: 100%;
   max-width: 420px;
   background-color: #fdf7ef;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  overflow: hidden;
 }
 
 /* ヘッダー */
@@ -65,6 +65,7 @@ html, body {
 
 /* 入力欄 */
 .chat-input-area {
+  flex-shrink: 0;
   background: #fdf7ef;
   padding: 0.5em 1em 1em;
   border-top: 1px solid #ccc;
@@ -101,7 +102,7 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  width: 70%;        /* ← 常に70%のスペースを確保 */
+  width: 70%;
   max-width: 70%;
 }
 
@@ -137,14 +138,14 @@ html, body {
   background-color: #fcfcfc;
   color: #333333;
   border: 1px solid #eee;
-  width: 100%;          /* ← 親（70%）いっぱいに表示 */
+  width: 100%;
   min-height: 1.5em;
   padding: 12px 16px;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   align-self: flex-end;
-  text-align: left;     /* ← 文字は左寄せ */
-  direction: ltr;       /* ← 左から右へ */
+  text-align: left;
+  direction: ltr;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
@@ -160,7 +161,7 @@ html, body {
   100% { transform: scale(1); }
 }
 
-/* スピナーアイコン（CSSアニメーション） */
+/* スピナー */
 .spinner-icon {
   margin: 0 auto;
   width: 24px;
@@ -177,6 +178,7 @@ html, body {
   }
 }
 
+/* フィードバックボタン */
 .feedback-btn {
   background: linear-gradient(135deg, #f7f7f7, #e6e6e6);
   border: 1px solid #ccc;
@@ -193,19 +195,9 @@ html, body {
 }
 
 .feedback-btn:hover {
-  background-color: #ffffff;     /* ✅ 白背景 */
+  background: #ffffff;         /* ← 白背景 */
   color: #222;
+  border-color: #aaa;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   transform: translateY(-1px);
-  border-color: #aaa;
-}
-
-.chat-container {
-  height: 90vh;  /* ← 高さを固定しつつ画面に収まる */
-  max-height: 90vh;
-  overflow: hidden;
-}
-
-#chat-container {
-  padding-bottom: 80px; /* ← 入力欄分の余白を下に追加 */
 }
