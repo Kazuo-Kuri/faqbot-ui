@@ -189,3 +189,13 @@ html, body {
 .feedback-btn:hover {
   background-color: #ffffff;
 }
+
+.chat-container {
+  height: 90vh;  /* ← 高さを固定しつつ画面に収まる */
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+#chat-container {
+  padding-bottom: 80px; /* ← 入力欄分の余白を下に追加 */
+}

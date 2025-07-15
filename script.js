@@ -1,4 +1,4 @@
-// script.js（GAS廃止・/feedback対応済みバージョン）
+// script.js（改善版：feedback送信ボタン自動スクロール対応済み）
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
@@ -67,6 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
     container.appendChild(feedbackDiv);
+    scrollToBottom();  // ボタン追加後もスクロール
 
     const buttons = feedbackDiv.querySelectorAll(".feedback-btn");
     buttons.forEach(btn => {
@@ -88,6 +89,9 @@ document.addEventListener("DOMContentLoaded", () => {
       <textarea id="reason-input" rows="2" placeholder="例：情報が古かった、質問と違う内容だった など" style="width: 100%; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; padding: 4px;"></textarea>
       <button id="submit-reason" style="margin-top: 4px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">送信</button>
     `;
+
+    scrollToBottom();  // フィードバックフォーム表示直後にスクロール
+
     const submitButton = container.querySelector("#submit-reason");
     submitButton.addEventListener("click", () => {
       const reason = container.querySelector("#reason-input").value.trim();
@@ -97,6 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       sendFeedback(question, answer, "not_useful", reason);
       container.innerHTML = "フィードバックありがとうございました！";
+      scrollToBottom();
     });
   }
 
