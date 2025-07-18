@@ -7,7 +7,6 @@ html, body {
   padding: 0;
   font-family: 'Helvetica Neue', sans-serif;
   background-color: #fdf7ef;
-  display: block;
   direction: ltr;
   text-align: left;
 }
@@ -64,21 +63,6 @@ html, body {
   gap: 1em;
   width: 100%;
   box-sizing: border-box;
-}
-
-/* 回答文量モード切り替えUI */
-.response-mode-wrapper {
-  width: 100%;
-  padding: 0.5em 1em 0;
-  box-sizing: border-box;
-  text-align: right;
-}
-
-#response-mode {
-  font-size: 0.9em;
-  padding: 2px 6px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
 }
 
 /* 入力欄 */
@@ -149,10 +133,13 @@ html, body {
   text-align: left;
 }
 
-/* 吹き出し内リンクの方向制御（特に英語やURL混在時に有効） */
+/* 吹き出し内リンクの方向制御（英語やURL混在時に有効） */
 .bubble a {
+  color: #0056cc;
+  text-decoration: underline;
   direction: ltr;
   unicode-bidi: embed;
+  word-break: break-word;
 }
 
 /* ユーザー吹き出し */
@@ -184,11 +171,6 @@ html, body {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pop {
-  0%   { transform: scale(0.95); }
-  100% { transform: scale(1); }
 }
 
 /* スピナー */
