@@ -1,4 +1,4 @@
-// script.js（アニメーション付き + マークダウンリンク対応）
+// ✅ script.js（行ごと・左から右に自然に流れる表示 + 入力欄修正）
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
@@ -6,10 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const md = window.markdownit({ breaks: true, linkify: true });
 
   function scrollToBottom() {
-    chatContainer.scrollTo({
-      top: chatContainer.scrollHeight,
-      behavior: "smooth"
-    });
+    chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: "smooth" });
   }
 
   function appendMessage(sender, message, alignment, originalQuestion = null) {
@@ -29,13 +26,38 @@ document.addEventListener("DOMContentLoaded", () => {
     scrollToBottom();
 
     if (alignment === "right") {
-      const html = md.render(message);
-      bubble.innerHTML = `<div class="typewriter">${html}</div>`;
-      scrollToBottom();
-      addFeedbackButtons(messageWrapper, originalQuestion, message);
+      typeLinesSequentially(bubble, message, originalQuestion, messageWrapper);
     } else {
       bubble.textContent = message;
     }
+  }
+
+  async function typeLinesSequentially(container, fullMessage, originalQuestion, messageWrapper) {
+    const lines = fullMessage.split("\n");
+
+    for (let i = 0; i < lines.length; i++) {
+      const lineEl = document.createElement("div");
+      container.appendChild(lineEl);
+      await typeLine(lineEl, lines[i]);
+    }
+
+    addFeedbackButtons(messageWrapper, originalQuestion, fullMessage);
+    scrollToBottom();
+  }
+
+  function typeLine(el, text, delay = 25) {
+    return new Promise(resolve => {
+      let i = 0;
+      const interval = setInterval(() => {
+        el.innerHTML += text[i];
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+          el.innerHTML = md.renderInline(el.textContent);
+          resolve();
+        }
+      }, delay);
+    });
   }
 
   function addFeedbackButtons(container, question, answer) {
@@ -69,18 +91,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showFeedbackReasonForm(container, question, answer) {
     container.innerHTML = `
-      <label for="reason-input" style="font-size: 0.8em; color: #666;">差し支えなければ、理由を教えてください：</label>
-      <textarea id="reason-input" rows="2" style="width: 100%; margin-top: 4px;"></textarea>
-      <button id="submit-reason" style="margin-top: 4px;">送信</button>
+      <label for="reason-input">差し支えなければ、理由を教えてください：</label>
+      <textarea id="reason-input" rows="2" placeholder="例：情報が古い、質問と違う内容だった等"></textarea>
+      <button id="submit-reason">送信</button>
     `;
-    scrollToBottom();
 
     container.querySelector("#submit-reason").addEventListener("click", () => {
       const reason = container.querySelector("#reason-input").value.trim();
-      if (!reason) return alert("理由を入力してください。");
+      if (!reason) return alert("理由を入力してください。")
       sendFeedback(question, answer, "not_useful", reason);
       container.innerHTML = "フィードバックありがとうございました！";
-      scrollToBottom();
     });
   }
 
@@ -89,6 +109,10 @@ document.addEventListener("DOMContentLoaded", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question, answer, feedback, reason })
+    }).then(res => res.json()).then(data => {
+      console.log("フィードバック送信成功:", data);
+    }).catch(err => {
+      console.error("送信エラー:", err);
     });
   }
 
@@ -105,10 +129,12 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question })
       });
+
       const data = await res.json();
       const answer = data.response?.trim() || "申し訳ありません、回答を取得できませんでした。";
       appendMessage("サポート", answer, "right", question);
-    } catch {
+    } catch (err) {
+      console.error("通信エラー:", err);
       appendMessage("サポート", "エラーが発生しました。", "right", question);
     } finally {
       spinner.style.display = "none";
@@ -123,6 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.closeChat = function () {
-    alert("チャットを閉じます（処理を追加できます）");
+    alert("チャットを閉じます（ここに閉じる処理を追加）");
   };
 });
