@@ -1,4 +1,4 @@
-// script.js（改善版：feedback送信ボタン自動スクロール対応済み）
+// script.js（最新版：Enter送信修正・スクロール・フィードバック対応済み）
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
@@ -62,12 +62,12 @@ document.addEventListener("DOMContentLoaded", () => {
     feedbackDiv.innerHTML = `
       <div style="margin-bottom: 0.2em; color: #666;">この回答は役に立ちましたか？</div>
       <div style="display: flex; gap: 0.5em; justify-content: flex-end;">
-        <button class="feedback-btn" data-feedback="useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👍 はい</button>
-        <button class="feedback-btn" data-feedback="not_useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👎 いいえ</button>
+        <button class="feedback-btn" data-feedback="useful">👍 はい</button>
+        <button class="feedback-btn" data-feedback="not_useful">👎 いいえ</button>
       </div>
     `;
     container.appendChild(feedbackDiv);
-    scrollToBottom(); // ボタン追加後もスクロール
+    scrollToBottom();
 
     const buttons = feedbackDiv.querySelectorAll(".feedback-btn");
     buttons.forEach(btn => {
@@ -89,7 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
       <textarea id="reason-input" rows="2" placeholder="例：情報が古かった、質問と違う内容だった など" style="width: 100%; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; padding: 4px;"></textarea>
       <button id="submit-reason" style="margin-top: 4px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">送信</button>
     `;
-
     scrollToBottom();
 
     const submitButton = container.querySelector("#submit-reason");
@@ -152,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       ask();
     }
