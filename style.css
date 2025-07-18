@@ -40,7 +40,7 @@ html, body {
   box-sizing: border-box;
 }
 
-.chat-header h1, .chat-title {
+.chat-title {
   font-size: 1.2em;
   margin: 0;
 }
@@ -131,9 +131,10 @@ html, body {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   direction: ltr;
   text-align: left;
+  overflow-wrap: anywhere;
 }
 
-/* 吹き出し内リンクの方向制御（英語やURL混在時に有効） */
+/* 吹き出し内リンクの方向制御 */
 .bubble a {
   color: #0056cc;
   text-decoration: underline;
@@ -212,4 +213,9 @@ html, body {
   border-color: #aaa;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   transform: translateY(-1px);
+}
+
+/* 応答の長さ選択UIは非表示に（自動判定のため） */
+.response-mode-wrapper {
+  display: none !important;
 }

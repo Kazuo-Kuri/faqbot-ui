@@ -1,4 +1,3 @@
-// script.js（文量切り替え送信なし + マークダウンリンク対応）
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
@@ -24,24 +23,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const bubble = document.createElement("div");
     bubble.className = `bubble ${alignment === "left" ? "user" : "support"}`;
 
-    if (alignment === "right") {
-      bubble.style.minWidth = "70%";
-      bubble.style.minHeight = "1.5em";
-    }
-
     messageWrapper.appendChild(label);
     messageWrapper.appendChild(bubble);
     chatContainer.appendChild(messageWrapper);
     scrollToBottom();
 
     if (alignment === "right") {
-      const html = md.render(message);
-      bubble.innerHTML = html;
-      scrollToBottom();
-      addFeedbackButtons(messageWrapper, originalQuestion, message);
+      typeMarkdownText(bubble, message, () => {
+        addFeedbackButtons(messageWrapper, originalQuestion, message);
+        scrollToBottom();
+      });
     } else {
-      bubble.textContent = message;
+      bubble.textContent = message.trim();
     }
+  }
+
+  function typeMarkdownText(element, text, callback) {
+    const html = md.render(text);
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+    const content = temp.innerHTML;
+    let index = 0;
+    element.innerHTML = "";
+
+    const interval = setInterval(() => {
+      element.innerHTML = content.slice(0, index++);
+      scrollToBottom();
+      if (index > content.length) {
+        clearInterval(interval);
+        if (callback) callback();
+      }
+    }, 8);
   }
 
   function addFeedbackButtons(container, question, answer) {
@@ -98,12 +110,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function sendFeedback(question, answer, feedback, reason) {
     const payload = { question, answer, feedback, reason };
+    console.log("送信内容:", payload);
+
     fetch("https://faqbot-ngw3.onrender.com/feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     })
       .then(res => res.json())
+      .then(data => {
+        console.log("サーバー応答:", data);
+      })
       .catch(err => {
         console.error("送信エラー:", err);
       });
