@@ -1,8 +1,8 @@
+// script.js（アニメーション付き + マークダウンリンク対応）
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
   const spinner = document.getElementById("loading-spinner");
-
   const md = window.markdownit({ breaks: true, linkify: true });
 
   function scrollToBottom() {
@@ -29,31 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
     scrollToBottom();
 
     if (alignment === "right") {
-      typeMarkdownText(bubble, message, () => {
-        addFeedbackButtons(messageWrapper, originalQuestion, message);
-        scrollToBottom();
-      });
-    } else {
-      bubble.textContent = message.trim();
-    }
-  }
-
-  function typeMarkdownText(element, text, callback) {
-    const html = md.render(text);
-    const temp = document.createElement("div");
-    temp.innerHTML = html;
-    const content = temp.innerHTML;
-    let index = 0;
-    element.innerHTML = "";
-
-    const interval = setInterval(() => {
-      element.innerHTML = content.slice(0, index++);
+      const html = md.render(message);
+      bubble.innerHTML = `<div class="typewriter">${html}</div>`;
       scrollToBottom();
-      if (index > content.length) {
-        clearInterval(interval);
-        if (callback) callback();
-      }
-    }, 8);
+      addFeedbackButtons(messageWrapper, originalQuestion, message);
+    } else {
+      bubble.textContent = message;
+    }
   }
 
   function addFeedbackButtons(container, question, answer) {
@@ -65,15 +47,14 @@ document.addEventListener("DOMContentLoaded", () => {
     feedbackDiv.innerHTML = `
       <div style="margin-bottom: 0.2em; color: #666;">この回答は役に立ちましたか？</div>
       <div style="display: flex; gap: 0.5em; justify-content: flex-end;">
-        <button class="feedback-btn" data-feedback="useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👍 はい</button>
-        <button class="feedback-btn" data-feedback="not_useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👎 いいえ</button>
+        <button class="feedback-btn" data-feedback="useful">👍 はい</button>
+        <button class="feedback-btn" data-feedback="not_useful">👎 いいえ</button>
       </div>
     `;
     container.appendChild(feedbackDiv);
     scrollToBottom();
 
-    const buttons = feedbackDiv.querySelectorAll(".feedback-btn");
-    buttons.forEach(btn => {
+    feedbackDiv.querySelectorAll(".feedback-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         const feedback = btn.dataset.feedback;
         if (feedback === "useful") {
@@ -89,19 +70,14 @@ document.addEventListener("DOMContentLoaded", () => {
   function showFeedbackReasonForm(container, question, answer) {
     container.innerHTML = `
       <label for="reason-input" style="font-size: 0.8em; color: #666;">差し支えなければ、理由を教えてください：</label>
-      <textarea id="reason-input" rows="2" placeholder="例：情報が古かった、質問と違う内容だった など" style="width: 100%; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; padding: 4px;"></textarea>
-      <button id="submit-reason" style="margin-top: 4px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">送信</button>
+      <textarea id="reason-input" rows="2" style="width: 100%; margin-top: 4px;"></textarea>
+      <button id="submit-reason" style="margin-top: 4px;">送信</button>
     `;
-
     scrollToBottom();
 
-    const submitButton = container.querySelector("#submit-reason");
-    submitButton.addEventListener("click", () => {
+    container.querySelector("#submit-reason").addEventListener("click", () => {
       const reason = container.querySelector("#reason-input").value.trim();
-      if (reason === "") {
-        alert("理由を入力してください。");
-        return;
-      }
+      if (!reason) return alert("理由を入力してください。");
       sendFeedback(question, answer, "not_useful", reason);
       container.innerHTML = "フィードバックありがとうございました！";
       scrollToBottom();
@@ -109,27 +85,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function sendFeedback(question, answer, feedback, reason) {
-    const payload = { question, answer, feedback, reason };
-    console.log("送信内容:", payload);
-
     fetch("https://faqbot-ngw3.onrender.com/feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log("サーバー応答:", data);
-      })
-      .catch(err => {
-        console.error("送信エラー:", err);
-      });
+      body: JSON.stringify({ question, answer, feedback, reason })
+    });
   }
 
   async function ask() {
     const question = input.value.trim();
     if (!question) return;
-
     appendMessage("ユーザー", question, "left");
     input.value = "";
     spinner.style.display = "block";
@@ -140,14 +105,10 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question })
       });
-
-      if (!res.ok) throw new Error("Network error");
-
       const data = await res.json();
       const answer = data.response?.trim() || "申し訳ありません、回答を取得できませんでした。";
       appendMessage("サポート", answer, "right", question);
-    } catch (err) {
-      console.error("通信エラー:", err);
+    } catch {
       appendMessage("サポート", "エラーが発生しました。", "right", question);
     } finally {
       spinner.style.display = "none";
@@ -162,6 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.closeChat = function () {
-    alert("チャットを閉じます（ここに閉じる処理を追加できます）");
+    alert("チャットを閉じます（処理を追加できます）");
   };
 });
