@@ -1,12 +1,15 @@
 @charset "utf-8";
+
 /* ベース設定 */
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
   font-family: 'Helvetica Neue', sans-serif;
-  background-color: #fdf7ef; /* ← チャットと同じ背景に統一 */
-  display: block;            /* ← flex を解除 */
+  background-color: #fdf7ef;
+  display: block;
+  direction: ltr;
+  text-align: left;
 }
 
 /* チャット全体コンテナ */
@@ -15,13 +18,15 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  height: 100%;             /* ← 100%に変更 */
+  height: 100%;
   width: 100%;
   max-width: 420px;
   background-color: #fdf7ef;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  margin: 0 auto;           /* ← 中央寄せ */
+  margin: 0 auto;
+  direction: ltr;
+  text-align: left;
 }
 
 /* ヘッダー */
@@ -61,6 +66,21 @@ html, body {
   box-sizing: border-box;
 }
 
+/* 回答文量モード切り替えUI */
+.response-mode-wrapper {
+  width: 100%;
+  padding: 0.5em 1em 0;
+  box-sizing: border-box;
+  text-align: right;
+}
+
+#response-mode {
+  font-size: 0.9em;
+  padding: 2px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 /* 入力欄 */
 .chat-input-area {
   flex-shrink: 0;
@@ -88,6 +108,8 @@ html, body {
   display: flex;
   flex-direction: column;
   max-width: 100%;
+  direction: ltr;
+  text-align: left;
 }
 
 .chat-message.left {
@@ -96,7 +118,7 @@ html, body {
 
 .chat-message.right {
   align-self: flex-end;
-  text-align: right;
+  text-align: left;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -109,6 +131,8 @@ html, body {
   font-size: 0.75em;
   color: #888;
   margin-bottom: 0.2em;
+  direction: ltr;
+  text-align: left;
 }
 
 /* 吹き出し共通 */
@@ -121,6 +145,14 @@ html, body {
   white-space: pre-wrap;
   word-wrap: break-word;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  direction: ltr;
+  text-align: left;
+}
+
+/* 吹き出し内リンクの方向制御（特に英語やURL混在時に有効） */
+.bubble a {
+  direction: ltr;
+  unicode-bidi: embed;
 }
 
 /* ユーザー吹き出し */
@@ -193,7 +225,7 @@ html, body {
 }
 
 .feedback-btn:hover {
-  background: #ffffff;         /* ← 白背景 */
+  background: #ffffff;
   color: #222;
   border-color: #aaa;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);

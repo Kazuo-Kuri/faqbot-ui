@@ -1,8 +1,9 @@
-// script.js（改善版：feedback送信ボタン自動スクロール対応済み）
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
   const spinner = document.getElementById("loading-spinner");
+  const responseMode = document.getElementById("response-mode"); // 文量切り替え
+  const md = window.markdownit(); // markdown-it 初期化
 
   function scrollToBottom() {
     chatContainer.scrollTo({
@@ -11,14 +12,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function typeText(element, text, speed = 60) {
+  function typeText(element, html, speed = 20) {
+    let tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+    const text = tempDiv.textContent || tempDiv.innerText || "";
     let index = 0;
     function showNextChar() {
       if (index < text.length) {
-        element.textContent += text.charAt(index);
-        index++;
+        element.textContent += text.charAt(index++);
         scrollToBottom();
         setTimeout(showNextChar, speed);
+      } else {
+        element.innerHTML = html; // 最後にHTMLで置き換え（リンクなど反映）
       }
     }
     showNextChar();
@@ -27,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function appendMessage(sender, message, alignment, originalQuestion = null) {
     const messageWrapper = document.createElement("div");
     messageWrapper.className = `chat-message ${alignment}`;
+    messageWrapper.setAttribute("dir", "ltr");
 
     const label = document.createElement("div");
     label.className = "label";
@@ -34,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const bubble = document.createElement("div");
     bubble.className = `bubble ${alignment === "left" ? "user" : "support"}`;
+    bubble.setAttribute("dir", "ltr");
 
     if (alignment === "right") {
       bubble.style.minWidth = "70%";
@@ -46,7 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
     scrollToBottom();
 
     if (alignment === "right") {
-      typeText(bubble, message);
+      const html = md.render(message); // markdown to HTML
+      typeText(bubble, html);
       addFeedbackButtons(messageWrapper, originalQuestion, message);
     } else {
       bubble.textContent = message;
@@ -62,15 +70,14 @@ document.addEventListener("DOMContentLoaded", () => {
     feedbackDiv.innerHTML = `
       <div style="margin-bottom: 0.2em; color: #666;">この回答は役に立ちましたか？</div>
       <div style="display: flex; gap: 0.5em; justify-content: flex-end;">
-        <button class="feedback-btn" data-feedback="useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👍 はい</button>
-        <button class="feedback-btn" data-feedback="not_useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👎 いいえ</button>
+        <button class="feedback-btn" data-feedback="useful">👍 はい</button>
+        <button class="feedback-btn" data-feedback="not_useful">👎 いいえ</button>
       </div>
     `;
     container.appendChild(feedbackDiv);
-    scrollToBottom();  // ボタン追加後もスクロール
+    scrollToBottom();
 
-    const buttons = feedbackDiv.querySelectorAll(".feedback-btn");
-    buttons.forEach(btn => {
+    feedbackDiv.querySelectorAll(".feedback-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         const feedback = btn.dataset.feedback;
         if (feedback === "useful") {
@@ -89,13 +96,11 @@ document.addEventListener("DOMContentLoaded", () => {
       <textarea id="reason-input" rows="2" placeholder="例：情報が古かった、質問と違う内容だった など" style="width: 100%; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; padding: 4px;"></textarea>
       <button id="submit-reason" style="margin-top: 4px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">送信</button>
     `;
+    scrollToBottom();
 
-    scrollToBottom();  // フィードバックフォーム表示直後にスクロール
-
-    const submitButton = container.querySelector("#submit-reason");
-    submitButton.addEventListener("click", () => {
+    container.querySelector("#submit-reason").addEventListener("click", () => {
       const reason = container.querySelector("#reason-input").value.trim();
-      if (reason === "") {
+      if (!reason) {
         alert("理由を入力してください。");
         return;
       }
@@ -107,26 +112,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function sendFeedback(question, answer, feedback, reason) {
     const payload = { question, answer, feedback, reason };
-    console.log("送信内容:", payload);
-
     fetch("https://faqbot-ngw3.onrender.com/feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log("サーバー応答:", data);
-      })
-      .catch(err => {
-        console.error("送信エラー:", err);
-      });
+    }).then(res => res.json()).then(data => {
+      console.log("サーバー応答:", data);
+    }).catch(err => {
+      console.error("送信エラー:", err);
+    });
   }
 
   async function ask() {
     const question = input.value.trim();
     if (!question) return;
 
+    const mode = responseMode?.value || "default"; // short / long / default
     appendMessage("ユーザー", question, "left");
     input.value = "";
     spinner.style.display = "block";
@@ -135,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch("https://faqbot-ngw3.onrender.com/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question })
+        body: JSON.stringify({ question, mode })
       });
 
       if (!res.ok) throw new Error("Network error");

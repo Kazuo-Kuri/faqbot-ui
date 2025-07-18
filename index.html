@@ -1,16 +1,26 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" dir="ltr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PSIサポートチャット</title>
   <link rel="stylesheet" href="style.css" />
   <style type="text/css">
-  body,td,th {
-    font-family: "Helvetica Neue", sans-serif;
-}
+    body, td, th {
+      font-family: "Helvetica Neue", sans-serif;
+    }
+    .response-mode-wrapper {
+      text-align: right;
+      margin: 0.5em 1em -0.5em;
+    }
+    #response-mode {
+      font-size: 0.9em;
+      padding: 2px 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
   </style>
-<script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
 </head>
 <body>
   <div class="chat-container">
@@ -27,19 +37,29 @@
         <div class="bubble support">こんにちは！どのようにお手伝いできますか？</div>
       </div>
     </div>
-      
-<!-- ローディングスピナー表示領域 -->
-<div id="loading-spinner" style="display: none; text-align: center; padding: 1em;">
-  <div class="spinner-icon"></div>
-  <div style="margin-top: 0.5em; color: #888;">⏳ 回答を作成中です...</div>
-</div>  
+
+    <!-- ローディングスピナー表示領域 -->
+    <div id="loading-spinner" style="display: none; text-align: center; padding: 1em;">
+      <div class="spinner-icon"></div>
+      <div style="margin-top: 0.5em; color: #888;">⏳ 回答を作成中です...</div>
+    </div>
+
+    <!-- 回答長さ選択 -->
+    <div class="response-mode-wrapper">
+      <label for="response-mode" style="font-size: 0.9em;">回答の長さ：</label>
+      <select id="response-mode">
+        <option value="default" selected>通常</option>
+        <option value="short">簡潔に</option>
+        <option value="long">詳しく</option>
+      </select>
+    </div>
 
     <!-- 入力欄 -->
     <div class="chat-input-area">
       <input type="text" id="question" placeholder="メッセージを入力..." />
-     </div>
     </div>
-    
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
