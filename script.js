@@ -26,14 +26,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function appendMessage(sender, message, alignment, originalQuestion = null) {
     const messageWrapper = document.createElement("div");
-    messageWrapper.className = chat-message ${alignment};
+    messageWrapper.className = `chat-message ${alignment}`;
 
     const label = document.createElement("div");
     label.className = "label";
     label.textContent = sender;
 
     const bubble = document.createElement("div");
-    bubble.className = bubble ${alignment === "left" ? "user" : "support"};
+    bubble.className = `bubble ${alignment === "left" ? "user" : "support"}`;
 
     if (alignment === "right") {
       bubble.style.minWidth = "70%";
@@ -59,15 +59,15 @@ document.addEventListener("DOMContentLoaded", () => {
     feedbackDiv.style.marginTop = "0.5em";
     feedbackDiv.style.fontSize = "0.85em";
 
-    feedbackDiv.innerHTML = 
+    feedbackDiv.innerHTML = `
       <div style="margin-bottom: 0.2em; color: #666;">この回答は役に立ちましたか？</div>
       <div style="display: flex; gap: 0.5em; justify-content: flex-end;">
         <button class="feedback-btn" data-feedback="useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👍 はい</button>
         <button class="feedback-btn" data-feedback="not_useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👎 いいえ</button>
       </div>
-    ;
+    `;
     container.appendChild(feedbackDiv);
-    scrollToBottom();  // ボタン追加後もスクロール
+    scrollToBottom(); // ボタン追加後もスクロール
 
     const buttons = feedbackDiv.querySelectorAll(".feedback-btn");
     buttons.forEach(btn => {
@@ -84,13 +84,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showFeedbackReasonForm(container, question, answer) {
-    container.innerHTML = 
+    container.innerHTML = `
       <label for="reason-input" style="font-size: 0.8em; color: #666;">差し支えなければ、理由を教えてください：</label>
       <textarea id="reason-input" rows="2" placeholder="例：情報が古かった、質問と違う内容だった など" style="width: 100%; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; padding: 4px;"></textarea>
       <button id="submit-reason" style="margin-top: 4px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">送信</button>
-    ;
+    `;
 
-    scrollToBottom();  // フィードバックフォーム表示直後にスクロール
+    scrollToBottom();
 
     const submitButton = container.querySelector("#submit-reason");
     submitButton.addEventListener("click", () => {
