@@ -95,11 +95,12 @@ html, body {
 
 .chat-message.left {
   align-self: flex-start;
+  width: 80%;
 }
 
 .chat-message.right {
   align-self: flex-end;
-  width: 100%;
+  width: 80%;
 }
 
 /* ラベル（ユーザー / サポート） */
@@ -120,13 +121,14 @@ html, body {
   word-wrap: break-word;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   box-sizing: border-box;
+  width: 100%;
 }
 
 /* ユーザー吹き出し */
 .bubble.user {
   background-color: #fffad4;
   color: #333333;
-  max-width: 80%;
+  max-width: 100%;
   animation: fadeIn 0.4s ease;
 }
 
@@ -135,7 +137,7 @@ html, body {
   background-color: #fcfcfc;
   color: #333333;
   border: 1px solid #eee;
-  width: 100%;  /* ← 安定した表示のため100%に固定 */
+  width: 100%;
   padding: 12px 16px;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
