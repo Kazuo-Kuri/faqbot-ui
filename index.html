@@ -1,11 +1,16 @@
-<!DOCTYPE html>
-<html lang="ja" dir="ltr">
+<!DOCTYPE html> 
+<html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PSIサポートチャット</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
+  <style type="text/css">
+  body,td,th {
+    font-family: "Helvetica Neue", sans-serif;
+}
+  </style>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
 </head>
 <body>
   <div class="chat-container">
@@ -22,19 +27,19 @@
         <div class="bubble support">こんにちは！どのようにお手伝いできますか？</div>
       </div>
     </div>
-
-    <!-- ローディングスピナー表示領域 -->
-    <div id="loading-spinner" style="display: none; text-align: center; padding: 1em;">
-      <div class="spinner-icon"></div>
-      <div style="margin-top: 0.5em; color: #888;">⏳ 回答を作成中です...</div>
-    </div>
+      
+<!-- ローディングスピナー表示領域 -->
+<div id="loading-spinner" style="display: none; text-align: center; padding: 1em;">
+  <div class="spinner-icon"></div>
+  <div style="margin-top: 0.5em; color: #888;">⏳ 回答を作成中です...</div>
+</div>  
 
     <!-- 入力欄 -->
     <div class="chat-input-area">
       <input type="text" id="question" placeholder="メッセージを入力..." />
+     </div>
     </div>
-  </div>
-
+    
   <script src="script.js"></script>
 </body>
 </html>
