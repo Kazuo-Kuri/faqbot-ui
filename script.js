@@ -3,25 +3,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
   const spinner = document.getElementById("loading-spinner");
-
+  const md = window.markdownit({ breaks: true, html: false });
+  const sendButton = document.getElementById("send-button");
+sendButton.addEventListener("click", () => {
+  ask();
+});
+    
   function scrollToBottom() {
     chatContainer.scrollTo({
       top: chatContainer.scrollHeight,
-      behavior: "smooth"
+      behavior: "auto"
     });
-  }
-
-  function typeText(element, text, speed = 60) {
-    let index = 0;
-    function showNextChar() {
-      if (index < text.length) {
-        element.textContent += text.charAt(index);
-        index++;
-        scrollToBottom();
-        setTimeout(showNextChar, speed);
-      }
-    }
-    showNextChar();
   }
 
   function appendMessage(sender, message, alignment, originalQuestion = null) {
@@ -41,11 +33,11 @@ document.addEventListener("DOMContentLoaded", () => {
     scrollToBottom();
 
     if (alignment === "right") {
-      typeText(bubble, message);
-      addFeedbackButtons(messageWrapper, originalQuestion, message);
-    } else {
-      bubble.textContent = message;
-    }
+  bubble.innerHTML = md.render(message); // ← markdown-it でHTMLリンク有効に
+  addFeedbackButtons(messageWrapper, originalQuestion, message);
+} else {
+  bubble.innerHTML = md.render(message);
+}
   }
 
   function addFeedbackButtons(container, question, answer) {
@@ -145,13 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
       spinner.style.display = "none";
     }
   }
-
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      ask();
-    }
-  });
 
   window.closeChat = function () {
     alert("チャットを閉じます（ここに閉じる処理を追加できます）");
