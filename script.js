@@ -1,13 +1,29 @@
-// script.js（minWidth指定削除済み）
+// script.js・・inWidthの処理を含む
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
   const chatContainer = document.getElementById("chat-container");
   const spinner = document.getElementById("loading-spinner");
   const md = window.markdownit({ breaks: true, html: false });
   const sendButton = document.getElementById("send-button");
-sendButton.addEventListener("click", () => {
-  ask();
-});
+  restoreChatHistory();
+    
+  // チャット履歴を復元
+  function restoreChatHistory() {
+    const chatLog = document.getElementById('chat-container');
+    const history = localStorage.getItem('chatHistory');
+    if (history) {
+      JSON.parse(history).forEach(entry => {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = entry.html;
+        chatLog.appendChild(wrapper.firstElementChild);
+      });
+    }
+  }
+    
+  sendButton.addEventListener("click", () => {
+    ask();
+    setTimeout(saveChatHistory, 100); // レスポンス後に履歴を保存
+  });
     
   function scrollToBottom() {
     chatContainer.scrollTo({
@@ -32,12 +48,10 @@ sendButton.addEventListener("click", () => {
     chatContainer.appendChild(messageWrapper);
     scrollToBottom();
 
+    bubble.innerHTML = md.render(message);
     if (alignment === "right") {
-  bubble.innerHTML = md.render(message); // ← markdown-it でHTMLリンク有効に
-  addFeedbackButtons(messageWrapper, originalQuestion, message);
-} else {
-  bubble.innerHTML = md.render(message);
-}
+      addFeedbackButtons(messageWrapper, originalQuestion, message);
+    }
   }
 
   function addFeedbackButtons(container, question, answer) {
@@ -47,10 +61,10 @@ sendButton.addEventListener("click", () => {
     feedbackDiv.style.fontSize = "0.85em";
 
     feedbackDiv.innerHTML = `
-      <div style="margin-bottom: 0.2em; color: #666;">この回答は役に立ちましたか？</div>
+      <div style="margin-bottom: 0.2em; color: #666;">この回答は参考になりましたか？</div>
       <div style="display: flex; gap: 0.5em; justify-content: flex-end;">
-        <button class="feedback-btn" data-feedback="useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👍 はい</button>
-        <button class="feedback-btn" data-feedback="not_useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">👎 いいえ</button>
+        <button class="feedback-btn" data-feedback="useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">はい</button>
+        <button class="feedback-btn" data-feedback="not_useful" style="background: transparent; border: 1px solid #ccc; border-radius: 6px; padding: 2px 8px; cursor: pointer; color: #666;">いいえ</button>
       </div>
     `;
     container.appendChild(feedbackDiv);
@@ -62,7 +76,7 @@ sendButton.addEventListener("click", () => {
         const feedback = btn.dataset.feedback;
         if (feedback === "useful") {
           sendFeedback(question, answer, feedback, "");
-          feedbackDiv.innerHTML = "フィードバックありがとうございました！";
+          feedbackDiv.innerHTML = "ご協力ありがとうございました。";
         } else {
           showFeedbackReasonForm(feedbackDiv, question, answer);
         }
@@ -72,8 +86,8 @@ sendButton.addEventListener("click", () => {
 
   function showFeedbackReasonForm(container, question, answer) {
     container.innerHTML = `
-      <label for="reason-input" style="font-size: 0.8em; color: #666;">差し支えなければ、理由を教えてください：</label>
-      <textarea id="reason-input" rows="2" placeholder="例：情報が古かった、質問と違う内容だった など" style="width: 100%; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; padding: 4px;"></textarea>
+      <label for="reason-input" style="font-size: 0.8em; color: #666;">よろしければ理由をお聞かせください（任意）</label>
+      <textarea id="reason-input" rows="2" placeholder="例：内容が質問とずれていた、説明がわかりづらかったなど" style="width: 100%; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; padding: 4px;"></textarea>
       <button id="submit-reason" style="margin-top: 4px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">送信</button>
     `;
 
@@ -87,14 +101,14 @@ sendButton.addEventListener("click", () => {
         return;
       }
       sendFeedback(question, answer, "not_useful", reason);
-      container.innerHTML = "フィードバックありがとうございました！";
+      container.innerHTML = "ご協力ありがとうございました。";
       scrollToBottom();
     });
   }
 
   function sendFeedback(question, answer, feedback, reason) {
     const payload = { question, answer, feedback, reason };
-    console.log("送信内容:", payload);
+    console.log("フィードバック送信:", payload);
 
     fetch("https://faqbot-ngw3.onrender.com/feedback", {
       method: "POST",
@@ -103,10 +117,10 @@ sendButton.addEventListener("click", () => {
     })
       .then(res => res.json())
       .then(data => {
-        console.log("サーバー応答:", data);
+        console.log("フィードバック結果:", data);
       })
       .catch(err => {
-        console.error("送信エラー:", err);
+        console.error("フィードバック送信エラー:", err);
       });
   }
 
@@ -128,17 +142,34 @@ sendButton.addEventListener("click", () => {
       if (!res.ok) throw new Error("Network error");
 
       const data = await res.json();
-      const answer = data.response?.trim() || "申し訳ありません、回答を取得できませんでした。";
+      const answer = data.response?.trim() || "申し訳ありませんが、回答を取得できませんでした。";
       appendMessage("サポート", answer, "right", question);
     } catch (err) {
       console.error("通信エラー:", err);
-      appendMessage("サポート", "エラーが発生しました。", "right", question);
+      appendMessage("サポート", "通信エラーが発生しました。", "right", question);
     } finally {
       spinner.style.display = "none";
     }
   }
 
   window.closeChat = function () {
-    alert("チャットを閉じます（ここに閉じる処理を追加できます）");
+    alert("チャットを閉じる処理は未実装です。今後のアップデートをお待ちください。");
   };
 });
+
+// チャット履歴の保存
+function saveChatHistory() {
+  const chatLog = document.getElementById('chat-container');
+  const messages = Array.from(chatLog.querySelectorAll('.chat-message')).map(el => {
+    const type = el.classList.contains('left') ? 'user' : 'bot';
+    const html = el.outerHTML; 
+    return { type, html };
+  });
+  localStorage.setItem('chatHistory', JSON.stringify(messages));
+}
+
+// チャット履歴のクリア（初期化）
+function clearChatHistory() {
+  localStorage.removeItem('chatHistory');
+  document.getElementById('chat-container').innerHTML = '';
+}
