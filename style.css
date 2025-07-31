@@ -10,7 +10,7 @@ html, body {
 }
 
 /* チャット全体コンテナ */
-.chat-area {
+.chat-container {
   display: flex;
   flex-direction: column;
   align-items: center;

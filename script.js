@@ -1,31 +1,3 @@
-// 回答を1文字ずつ表示する関数
-function typeText(text, element, callback) {
-  let i = 0;
-  const interval = setInterval(() => {
-    if (i < text.length) {
-      element.innerHTML += text.charAt(i);
-      i++;
-    } else {
-      clearInterval(interval);
-      if (callback) callback();
-    }
-  }, 10);
-}
-
-typeText(response, answerElement, () => {
-  makeLinksOpenInNewTab("chat-container"); 
-});
-
-function makeLinksOpenInNewTab(containerId = "chat-container") {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  const links = container.querySelectorAll("a");
-  links.forEach(link => {
-    link.setAttribute("target", "_blank");
-    link.setAttribute("rel", "noopener noreferrer");
-  });
-}
-
 // script.js・・inWidthの処理を含む
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
@@ -200,31 +172,4 @@ function saveChatHistory() {
 function clearChatHistory() {
   localStorage.removeItem('chatHistory');
   document.getElementById('chat-container').innerHTML = '';
-}
-
-// ファイルの末尾に以下を追加
-window.onload = function () {
-  const sendButton = document.getElementById("send-button");
-  const userInput = document.getElementById("user-input");
-
-  if (sendButton && userInput) {
-    sendButton.addEventListener("click", handleSend);
-    userInput.addEventListener("keydown", function (event) {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        handleSend();
-      }
-    });
-  }
-};
-
-// 共通の送信処理関数
-async function handleSend() {
-  const userInput = document.getElementById("user-input");
-  const message = userInput.value.trim();
-  if (message === "") return;
-
-  addMessage("user", message);
-  userInput.value = "";
-  await sendToServer(message);
 }
