@@ -13,10 +13,10 @@ function typeText(text, element, callback) {
 }
 
 typeText(response, answerElement, () => {
-  makeLinksOpenInNewTab("chat-container"); // ← chat-areaに変更（必要に応じて）
+  makeLinksOpenInNewTab("chat-area"); // ← chat-areaに変更（必要に応じて）
 });
 
-function makeLinksOpenInNewTab(containerId = "chat-container") {
+function makeLinksOpenInNewTab(containerId = "chat-area") {
   const container = document.getElementById(containerId);
   if (!container) return;
   const links = container.querySelectorAll("a");
