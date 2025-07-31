@@ -1,3 +1,31 @@
+// 回答を1文字ずつ表示する関数
+function typeText(text, element, callback) {
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < text.length) {
+      element.innerHTML += text.charAt(i);
+      i++;
+    } else {
+      clearInterval(interval);
+      if (callback) callback();
+    }
+  }, 10);
+}
+
+typeText(response, answerElement, () => {
+  makeLinksOpenInNewTab("chat-container"); // ← chat-areaに変更（必要に応じて）
+});
+
+function makeLinksOpenInNewTab(containerId = "chat-container") {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const links = container.querySelectorAll("a");
+  links.forEach(link => {
+    link.setAttribute("target", "_blank");
+    link.setAttribute("rel", "noopener noreferrer");
+  });
+}
+
 // script.js・・inWidthの処理を含む
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("question");
