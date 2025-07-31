@@ -201,3 +201,30 @@ function clearChatHistory() {
   localStorage.removeItem('chatHistory');
   document.getElementById('chat-container').innerHTML = '';
 }
+
+// ファイルの末尾に以下を追加
+window.onload = function () {
+  const sendButton = document.getElementById("send-button");
+  const userInput = document.getElementById("user-input");
+
+  if (sendButton && userInput) {
+    sendButton.addEventListener("click", handleSend);
+    userInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        handleSend();
+      }
+    });
+  }
+};
+
+// 共通の送信処理関数
+async function handleSend() {
+  const userInput = document.getElementById("user-input");
+  const message = userInput.value.trim();
+  if (message === "") return;
+
+  addMessage("user", message);
+  userInput.value = "";
+  await sendToServer(message);
+}
